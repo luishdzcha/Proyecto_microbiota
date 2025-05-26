@@ -1,0 +1,11 @@
+OTU_ID,Sample_1,Sample_2,Sample_3,Sample_4,Sample_5,Kingdom,Phylum,Class,Order,Family,Genus,Species
+OTU_1,150,200,180,170,160,Bacteria,Bacteroidetes,Bacteroidia,Bacteroidales,Bacteroidaceae,Bacteroides,Bacteroides_uniformis
+OTU_2,300,250,280,270,290,Bacteria,Firmicutes,Clostridia,Clostridiales,Lachnospiraceae,Roseburia,Roseburia_intestinalis
+OTU_3,50,60,55,58,52,Bacteria,Firmicutes,Clostridia,Clostridiales,Ruminococcaceae,Faecalibacterium,Faecalibacterium_prausnitzii
+OTU_4,120,110,115,118,112,Bacteria,Firmicutes,Clostridia,Clostridiales,Lachnospiraceae,Blautia,Blautia_obeum
+OTU_5,80,90,85,88,82,Bacteria,Actinobacteria,Actinobacteria,Bifidobacteriales,Bifidobacteriaceae,Bifidobacterium,Bifidobacterium_adolescentis
+OTU_6,200,180,190,185,195,Bacteria,Bacteroidetes,Bacteroidia,Bacteroidales,Prevotellaceae,Prevotella,Prevotella_copri
+OTU_7,30,35,32,33,34,Bacteria,Proteobacteria,Gammaproteobacteria,Enterobacterales,Enterobacteriaceae,Escherichia,Escherichia_coli
+OTU_8,70,75,72,73,74,Bacteria,Firmicutes,Bacilli,Lactobacillales,Lactobacillaceae,Lactobacillus,Lactobacillus_acidophilus
+OTU_9,25,30,28,27,26,Bacteria,Firmicutes,Clostridia,Clostridiales,Ruminococcaceae,Ruminococcus,Ruminococcus_bromii
+OTU_10,40,45,42,43,44,Bacteria,Verrucomicrobia,Verrucomicrobiae,Verrucomicrobiales,Akkermansiaceae,Akkermansia,Akkermansia_muciniphila

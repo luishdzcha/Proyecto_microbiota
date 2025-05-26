@@ -1,0 +1,318 @@
+---
+title: "Proyecto_final"
+author: "Andrés Chávez, Luis Hernandez"
+date: "2025-05-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Preparación de datós
+
+En la siguiente seccion se cargaran los distintos archivos a utilizar asi como los paquetes a cargar
+
+```{r}
+library(tidyverse)
+library(metamicrobiomeR)
+library(MicrobiotaProcess)
+library(dplyr)
+library(phyloseq)
+library(microbiome)
+library(ggplot2)
+
+```
+
+```{r}
+meta_pacientes <- read.csv("proyecto final/metadatos_pacientes.csv", stringsAsFactors = FALSE)
+meta_referencia <- read.csv("proyecto final/metadatos_referencia.csv", stringsAsFactors = FALSE)
+muestras_pacientes <- read.csv("proyecto final/muestras_pacientes.csv.csv", stringsAsFactors = FALSE)
+referencia_controles <- read.csv("proyecto final/referencia_controles_sanos.csv.csv", stringsAsFactors = FALSE)
+```
+
+## Código de análisis comparativo
+
+En el siguiente codigo se realiza el procesado y analisis de datos de microbioma
+
+```{r}
+## 2. Procesamiento de datos de referencia
+# Preparar datos de referencia para el paquete metamicrobiomeR
+# Convertir a formato tidy (datos largos) donde cada fila es una observación
+ref_tidy <- referencia_controles %>%
+  pivot_longer(cols = starts_with("Sample_"),  # Convierte columnas de muestras a filas
+               names_to = "SampleID",         # Nombres de muestras van a columna SampleID
+               values_to = "Abundance") %>%   # Valores de abundancia van a columna Abundance
+  mutate(Group = "Healthy") %>%               # Añade columna Group con valor "Healthy"
+  left_join(meta_referencia, by = c("SampleID", "Group"))  # Une con metadatos de referencia
+
+# Crear objeto phyloseq para controles sanos
+# Tabla de abundancia (OTU table)
+otu_ref <- referencia_controles %>%
+  select(starts_with("Sample_")) %>%  # Selecciona solo columnas de muestras
+  as.matrix() %>%                     # Convierte a matriz
+  t()                                 # Transpone la matriz (muestras como filas)
+colnames(otu_ref) <- referencia_controles$OTU_ID  # Asigna nombres de taxones (OTUs)
+
+# Taxonomía - información clasificatoria de los microorganismos
+tax_ref <- referencia_controles %>%
+  select(Kingdom:Species) %>%  # Selecciona columnas de clasificación taxonómica
+  as.matrix()                  # Convierte a matriz
+rownames(tax_ref) <- referencia_controles$OTU_ID  # Asigna nombres de filas (OTUs)
+
+# Metadatos - información sobre las muestras
+meta_ref <- meta_referencia
+rownames(meta_ref) <- meta_ref$SampleID  # Asigna nombres de filas (IDs de muestra)
+
+# Crear objeto phyloseq combinando todos los componentes
+physeq_ref <- phyloseq(
+  otu_table(otu_ref, taxa_are_rows = FALSE),  # Tabla de abundancia
+  tax_table(tax_ref),                         # Tabla de taxonomía
+  sample_data(meta_ref)                       # Metadatos de muestras
+)
+
+## 3. Procesamiento de datos de pacientes 
+# Preparar datos de pacientes
+# Tabla de abundancia
+otu_pat <- muestras_pacientes %>%
+  select(starts_with("Paciente_")) %>%  # Selecciona columnas de pacientes
+  as.matrix() %>%
+  t()                                  # Transpone matriz
+colnames(otu_pat) <- muestras_pacientes$OTU_ID  # Nombres de columnas (OTUs)
+
+# Taxonomía (usamos la misma que para referencia pero filtramos solo OTUs presentes)
+tax_pat <- referencia_controles %>%
+  select(OTU_ID, Kingdom:Species) %>%  # Selecciona columnas taxonómicas
+  filter(OTU_ID %in% colnames(otu_pat)) %>%  # Filtra OTUs presentes en pacientes
+  column_to_rownames("OTU_ID") %>%     # Convierte OTU_ID en nombres de filas
+  as.matrix()
+
+# Metadatos de pacientes
+meta_pat <- meta_pacientes
+rownames(meta_pat) <- meta_pat$SampleID  # Asigna nombres de filas (IDs de muestra)
+
+# Crear objeto phyloseq para pacientes
+physeq_pat <- phyloseq(
+  otu_table(otu_pat, taxa_are_rows = FALSE),  # Tabla de abundancia
+  tax_table(tax_pat),                         # Tabla de taxonomía
+  sample_data(meta_pat)                       # Metadatos de muestras
+)
+
+## 4. Análisis comparativo: Referencia vs Pacientes 
+
+# Combinar datos de referencia y pacientes en un solo objeto phyloseq
+physeq_comp <- merge_phyloseq(physeq_ref, physeq_pat)
+
+# Normalizar datos 
+physeq_comp_norm <- transform_sample_counts(physeq_comp, function(x) x / sum(x))
+
+# Análisis de diversidad alfa 
+alpha_div_comp <- microbiome::alpha(physeq_comp_norm, index = "shannon")  # Calcula índice Shannon
+
+# Crear data.frame de metadatos manualmente para el gráfico
+meta_df <- data.frame(
+  SampleID = sample_names(physeq_comp_norm),  # Nombres de muestras
+  Group = ifelse(grepl("Sample", sample_names(physeq_comp_norm)), "Healthy", "Patient")  # Clasifica en grupos
+)
+
+# Combinar diversidad alfa con metadatos
+alpha_div_comp <- cbind(meta_df, alpha_div_comp)
+
+# Visualizar diversidad alfa por grupo 
+ggplot(alpha_div_comp, aes(x = Group, y = diversity_shannon, fill = Group)) +
+  geom_boxplot() +
+  labs(title = "Diversidad Alfa (Shannon): Controles vs Pacientes",
+       y = "Índice de Shannon", x = "Grupo") +
+  theme_minimal()
+
+# Análisis de diversidad beta (diferencias entre muestras) usando PCoA
+ord_comp <- ordinate(physeq_comp_norm, method = "PCoA", distance = "bray")  # Calcula PCoA con distancia Bray-Curtis
+plot_ordination(physeq_comp_norm, ord_comp, color = "Group") +  # Grafica resultados
+  geom_point(size = 3) +
+  stat_ellipse(level = 0.95) +  # Añade elipses de confianza
+  labs(title = "PCoA: Controles vs Pacientes") +
+  theme_minimal()
+```
+
+## Código de análisis longitudinal
+
+El siguiente codigo muestra la carga y el procesado de los datos longitudinales con dos tipos de visualizaciones
+
+```{r}
+## 5. Procesamiento y análisis longitudinal 
+# Cargar datos
+microbiome_data <- read_csv("proyecto final/datos_longitudinales.csv")
+metadata <- read_csv("proyecto final/metadatos_longitudinales.csv")
+
+# Filtrar por paciente
+patient1 <- microbiome_data %>% filter(SubjectID == "Patient1") %>%
+  left_join(metadata %>% filter(SubjectID == "Patient1"), by = c("SampleID", "SubjectID", "Timepoint", "Intervention"))
+
+patient2 <- microbiome_data %>% filter(SubjectID == "Patient2") %>%
+  left_join(metadata %>% filter(SubjectID == "Patient2"), by = c("SampleID", "SubjectID", "Timepoint", "Intervention"))
+
+# Preparar datos de abundancia
+p1_abund <- patient1 %>%
+  select(SampleID, OTU_1:OTU_10) %>%
+  column_to_rownames("SampleID") %>%
+  t() %>%
+  as.data.frame()
+
+#Para el paciente 2
+p2_abund <- patient2 %>%  #  Aquí se usan solo datos de Patient2
+  select(SampleID, OTU_1:OTU_10) %>%
+  column_to_rownames("SampleID") %>%
+  t() %>%
+  as.data.frame()
+
+# Análisis de cambios en OTUs específicas
+generos_bacterianos <- c(
+  "OTU_1" = "Bacteroides",
+  "OTU_2" = "Faecalibacterium",
+  "OTU_3" = "Escherichia",
+  "OTU_4" = "Bifidobacterium",
+  "OTU_5" = "Ruminococcus",
+  "OTU_6" = "Akkermansia",
+  "OTU_7" = "Prevotella",
+  "OTU_8" = "Roseburia",
+  "OTU_9" = "Clostridium",
+  "OTU_10" = "Lactobacillus"
+)
+
+# Gráfico para Paciente 1 
+p1_changes <- patient1 %>%
+  pivot_longer(cols = OTU_1:OTU_10, names_to = "OTU", values_to = "Abundance") %>%
+  mutate(Genero = generos_bacterianos[OTU]) %>%  # Asignar géneros
+  group_by(OTU) %>%
+  mutate(RelAbund = Abundance / sum(Abundance)) %>%
+  ungroup()
+
+ggplot(p1_changes, aes(x = Timepoint, y = RelAbund, color = Genero)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~Genero, scales = "free_y") +  # Facetas por género
+  labs(title = "Dinámica Bacteriana por Género - Paciente 1",
+       x = "Punto de Tiempo", y = "Abundancia Relativa") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 9, face = "italic"),  # Géneros fuente italica
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+
+# Gráfico para Paciente 2 
+
+p2_changes <- patient2 %>%
+  pivot_longer(cols = OTU_1:OTU_10, names_to = "OTU", values_to = "Abundance") %>%
+  mutate(Genero = generos_bacterianos[OTU]) %>%  # Usar los mismos géneros
+  group_by(OTU) %>%
+  mutate(RelAbund = Abundance / sum(Abundance)) %>%
+  ungroup()
+
+ggplot(p2_changes, aes(x = Timepoint, y = RelAbund, color = Genero)) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~Genero, scales = "free_y") +
+  labs(title = "Dinámica Bacteriana por Género - Paciente 2",
+       x = "Punto de Tiempo", y = "Abundancia Relativa") +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 9, face = "italic"),
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+
+```
+
+```{r}
+
+# Cargar datos
+# Preparar datos longitudinales
+# Tabla de abundancia 
+datos_long <- read.csv("proyecto final/datos_longitudinales.csv", stringsAsFactors = FALSE)
+meta_long <- read.csv("proyecto final/metadatos_longitudinales.csv", stringsAsFactors = FALSE)
+
+otu_long <- datos_long %>%
+  select(starts_with("OTU_")) %>%
+  as.matrix()
+rownames(otu_long) <- datos_long$SampleID  # Asignar IDs de muestra
+
+# Taxonomía (OTUs × niveles taxonómicos) - usar referencia_controles
+tax_long <- referencia_controles %>%
+  select(OTU_ID, Kingdom:Species) %>%
+  filter(OTU_ID %in% colnames(otu_long)) %>%  # Solo OTUs presentes
+  column_to_rownames("OTU_ID") %>%
+  as.matrix()
+
+# Metadatos
+meta_long <- meta_long %>%
+  left_join(meta_pacientes, by = c("SubjectID" = "SampleID")) %>%
+  mutate(Group = ifelse(grepl("Patient", SubjectID), "Patient", "Healthy"))
+rownames(meta_long) <- meta_long$SampleID
+
+# Objeto phyloseq longitudinal
+physeq_long <- phyloseq(
+  otu_table(otu_long, taxa_are_rows = FALSE),
+  tax_table(tax_long),
+  sample_data(meta_long)
+)
+
+# Filtrar solo pacientes para análisis longitudinal
+physeq_patients <- subset_samples(physeq_long, Group == "Patient")
+
+# Análisis de tendencias temporales
+mpse_patients <- as.MPSE(physeq_patients)
+
+# Modelar cambios en el tiempo por intervención
+time_analysis <- mpse_patients %>%
+  mp_diff_analysis(
+    .abundance = Abundance,
+    .group = Intervention,
+    .sec.group = Timepoint,
+    action = "add"
+  )
+
+# Visualizar resultados
+mp_plot_abundance(
+  time_analysis,
+  .group = Intervention,
+  .sec.group = Timepoint,
+  taxa.class = "Genus",
+  topn = 5,
+  relative = TRUE
+) +
+  labs(title = "Cambios en la abundancia por intervención a lo largo del tiempo")
+
+# Modificar la visualización original con facetas
+plot_original <- mp_plot_abundance(
+  time_analysis,
+  .group = Intervention,
+  .sec.group = Timepoint,
+  taxa.class = "Genus",
+  topn = 5,
+  relative = TRUE
+) 
+
+# Añadir facetas y ajustar posición
+
+plot_original + 
+  facet_grid(~ Timepoint, scales = "free_x") +  # Facetas horizontalmente por tiempo
+  geom_col(position = position_dodge(width = 0.8)) +  # Barras separadas
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),  # Rotar etiquetas
+    legend.position = "bottom"
+  ) +
+  labs(title = "Abundancia por intervención en diferentes tiempos")
+
+#para agrupar datos no validos
+plot_original + 
+  facet_grid(~ ifelse(Timepoint %in% tail(unique(Timepoint), 4), NA, Timepoint), scales = "free_x") +
+  geom_col(position = position_dodge(width = 0.8)) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom"
+  ) +
+  labs(title = "Abundancia por intervención en diferentes tiempos")
+```

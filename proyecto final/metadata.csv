@@ -1,0 +1,16 @@
+PatientID,Day,SampleID,Group
+P1,0,P1_D0,Control
+P1,30,P1_D30,Control
+P1,90,P1_D90,Control
+P2,0,P2_D0,Treatment
+P2,30,P2_D30,Treatment
+P2,90,P2_D90,Treatment
+P3,0,P3_D0,Control
+P3,30,P3_D30,Control
+P3,90,P3_D90,Control
+P4,0,P4_D0,Control
+P4,30,P4_D30,Control
+P4,90,P4_D90,Control
+P5,0,P5_D0,Control
+P5,30,P5_D30,Control
+P5,90,P5_D90,Control

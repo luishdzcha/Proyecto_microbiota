@@ -1,0 +1,11 @@
+OTU_ID,Paciente_1,Paciente_2,Paciente_3,Paciente_4,Kingdom,Phylum,Class,Order,Family,Genus,Species
+OTU_1,50,60,70,80,Bacteria,Bacteroidetes,Bacteroidia,Bacteroidales,Bacteroidaceae,Bacteroides,Bacteroides_uniformis
+OTU_2,100,90,80,70,Bacteria,Firmicutes,Clostridia,Clostridiales,Lachnospiraceae,Roseburia,Roseburia_intestinalis
+OTU_3,10,15,20,25,Bacteria,Firmicutes,Clostridia,Clostridiales,Ruminococcaceae,Faecalibacterium,Faecalibacterium_prausnitzii
+OTU_4,200,220,240,260,Bacteria,Firmicutes,Clostridia,Clostridiales,Lachnospiraceae,Blautia,Blautia_obeum
+OTU_5,5,10,15,20,Bacteria,Actinobacteria,Actinobacteria,Bifidobacteriales,Bifidobacteriaceae,Bifidobacterium,Bifidobacterium_adolescentis
+OTU_6,300,280,260,240,Bacteria,Bacteroidetes,Bacteroidia,Bacteroidales,Prevotellaceae,Prevotella,Prevotella_copri
+OTU_7,150,160,170,180,Bacteria,Proteobacteria,Gammaproteobacteria,Enterobacterales,Enterobacteriaceae,Escherichia,Escherichia_coli
+OTU_8,2,3,4,5,Bacteria,Firmicutes,Bacilli,Lactobacillales,Lactobacillaceae,Lactobacillus,Lactobacillus_acidophilus
+OTU_9,80,90,100,110,Bacteria,Firmicutes,Clostridia,Clostridiales,Ruminococcaceae,Ruminococcus,Ruminococcus_bromii
+OTU_10,1,2,1,1,Bacteria,Verrucomicrobia,Verrucomicrobiae,Verrucomicrobiales,Akkermansiaceae,Akkermansia,Akkermansia_muciniphila

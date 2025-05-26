@@ -1,0 +1,11 @@
+SampleID,SubjectID,Timepoint,Intervention,Age,Gender,BMI,ClinicalScore
+P1_T0,Patient1,0,Baseline,45,Male,28.5,3.2
+P1_T1,Patient1,1,Antibiotics,45,Male,28.3,5.8
+P1_T2,Patient1,2,Probiotics,45,Male,28.1,4.5
+P1_T3,Patient1,3,Probiotics,45,Male,27.9,3.8
+P1_T4,Patient1,4,None,45,Male,27.8,3.1
+P2_T0,Patient2,0,Baseline,50,Female,30.2,3.5
+P2_T1,Patient2,1,Antibiotics,50,Female,30.0,6.0
+P2_T2,Patient2,2,Diet,50,Female,29.8,4.8
+P2_T3,Patient2,3,Diet,50,Female,29.5,4.0
+P2_T4,Patient2,4,None,50,Female,29.3,3.3

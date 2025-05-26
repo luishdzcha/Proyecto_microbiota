@@ -1,0 +1,11 @@
+SampleID,Timepoint,Intervention,SubjectID,OTU_1,OTU_2,OTU_3,OTU_4,OTU_5,OTU_6,OTU_7,OTU_8,OTU_9,OTU_10,Kingdom,Phylum,Class,Order,Family,Genus,Species
+P1_T0,0,Baseline,Patient1,150,300,50,120,80,200,30,70,25,40,Bacteria,Bacteroidetes,Bacteroidia,Bacteroidales,Bacteroidaceae,Bacteroides,Bacteroides_uniformis
+P1_T1,1,Antibiotics,Patient1,50,100,10,200,5,300,150,2,80,1,Bacteria,Firmicutes,Clostridia,Clostridiales,Lachnospiraceae,Roseburia,Roseburia_intestinalis
+P1_T2,2,Probiotics,Patient1,100,200,20,150,20,250,80,10,60,5,Bacteria,Firmicutes,Clostridia,Clostridiales,Ruminococcaceae,Faecalibacterium,Faecalibacterium_prausnitzii
+P1_T3,3,Probiotics,Patient1,130,250,40,130,40,220,50,20,50,10,Bacteria,Firmicutes,Clostridia,Clostridiales,Lachnospiraceae,Blautia,Blautia_obeum
+P1_T4,4,None,Patient1,140,280,45,110,50,180,40,30,40,15,Bacteria,Actinobacteria,Actinobacteria,Bifidobacteriales,Bifidobacteriaceae,Bifidobacterium,Bifidobacterium_adolescentis
+P2_T0,0,Baseline,Patient2,160,280,60,110,90,190,25,65,30,42,Bacteria,Bacteroidetes,Bacteroidia,Bacteroidales,Prevotellaceae,Prevotella,Prevotella_copri
+P2_T1,1,Antibiotics,Patient2,60,90,15,220,8,280,140,4,85,2,Bacteria,Proteobacteria,Gammaproteobacteria,Enterobacterales,Enterobacteriaceae,Escherichia,Escherichia_coli
+P2_T2,2,Diet,Patient2,110,180,25,170,25,230,90,8,70,4,Bacteria,Firmicutes,Bacilli,Lactobacillales,Lactobacillaceae,Lactobacillus,Lactobacillus_acidophilus
+P2_T3,3,Diet,Patient2,140,230,35,140,35,200,60,15,55,8,Bacteria,Firmicutes,Clostridia,Clostridiales,Ruminococcaceae,Ruminococcus,Ruminococcus_bromii
+P2_T4,4,None,Patient2,150,260,50,120,45,170,45,25,45,12,Bacteria,Verrucomicrobia,Verrucomicrobiae,Verrucomicrobiales,Akkermansiaceae,Akkermansia,Akkermansia_muciniphila

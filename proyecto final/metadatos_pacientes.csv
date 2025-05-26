@@ -1,0 +1,5 @@
+SampleID,Group,Age,Gender,BMI,Diagnosis
+Paciente_1,Patient,45,Male,28.5,IBS
+Paciente_2,Patient,50,Female,30.2,IBS
+Paciente_3,Patient,38,Male,27.8,IBD
+Paciente_4,Patient,42,Female,29.5,IBD
